@@ -1,0 +1,155 @@
+function Main() {
+  var spreadsheet = SpreadsheetApp.openById("1KNKpDkXy0Z1dhajtGTND3E9L0QwRcyIMZUJ0KixxbpA");
+  var sheet_form = spreadsheet.getSheetByName("Form");
+  var sheet_result = spreadsheet.getSheetByName("Current");
+  
+  DotToComma(sheet_form);
+  Transfer(sheet_form,sheet_result);
+  
+  sheet_result.getRange(2,1,sheet_result.getLastRow(),7).sort(1);
+}
+
+function DotToComma(sheet) {
+  var range = sheet.getRange("D2:D");
+  range.setValues(range.getValues().map(function(row) {
+    return [row[0].toString().replace(".", ",")];
+  }));
+}
+
+function Transfer(sheet_form,sheet_result){
+  var N_last_form = sheet_form.getLastRow();
+  var N_last_result = sheet_result.getLastRow();
+  N_last_result++;
+  var row_form = sheet_form.getRange(N_last_form, 1, 1, 12);
+  var form = row_form.getValues();
+  
+  var result = [[]];
+
+  if(form[0][6] == "Обмен валют"){
+     var rows_result = sheet_result.getRange(N_last_result, 1, 2, 7);
+    
+    if(form[0][1] == ""){
+      result[0][0] = form[0][0];
+    }else{
+      result[0][0] = form[0][1];
+    }
+    result[0][1] = "FALSE";
+    result[0][2] = form[0][2];
+    result[0][3] = form[0][3];
+    switch(form[0][4]){
+      case "Кроны":
+        result[0][4] = "Kč";
+        break;
+      case "Евро":
+        result[0][4] = "€";
+        break;
+      case "Доллары":
+        result[0][4] = "$";
+        break;
+      case "Рубли":
+        result[0][4] = "₽";
+        break;
+    }
+    result[0][5] = form[0][6];
+    result[0][6] = "FALSE";
+    
+    result.push([]);
+    if(form[0][1] == ""){
+      result[1][0] = form[0][0];
+    }else{
+      result[1][0] = form[0][1];
+    }
+    result[1][1] = "TRUE";
+    result[1][2] = form[0][2];
+    result[1][3] = form[0][10];
+    switch(form[0][11]){
+      case "Кроны":
+        result[1][4] = "Kč";
+        break;
+      case "Евро":
+        result[1][4] = "€";
+        break;
+      case "Доллары":
+        result[1][4] = "$";
+        break;
+      case "Рубли":
+        result[1][4] = "₽";
+        break;
+    }
+    result[1][5] = form[0][6];
+    result[1][6] = "FALSE";     
+  }else if(form[0][6] == "Пополнение кредитки"){
+    var rows_result = sheet_result.getRange(N_last_result, 1, 1, 7);
+  
+    if(form[0][1] == ""){
+      result[0][0] = form[0][0];
+    }else{
+      result[0][0] = form[0][1];
+    }
+    result[0][1] = "FALSE";
+    result[0][2] = form[0][2];
+    result[0][3] = form[0][3];
+    switch(form[0][4]){
+      case "Кроны":
+        result[0][4] = "Kč";
+        break;
+      case "Евро":
+        result[0][4] = "€";
+        break;
+      case "Доллары":
+        result[0][4] = "$";
+        break;
+      case "Рубли":
+        result[0][4] = "₽";
+        break;
+    }
+    result[0][5] = form[0][6];
+    result[0][6] = "TRUE";    
+  }else{
+    var rows_result = sheet_result.getRange(N_last_result, 1, 1, 7);
+  
+    if(form[0][1] == ""){
+      result[0][0] = form[0][0];
+    }else{
+      result[0][0] = form[0][1];
+    }
+    switch(form[0][6]){
+      case "Да":
+        result[0][1] = "TRUE";
+        break;
+      case "Нет":
+        result[0][1] = "FALSE";
+        break;}
+    result[0][2] = form[0][2];
+    result[0][3] = form[0][3];
+    switch(form[0][4]){
+      case "Кроны":
+        result[0][4] = "Kč";
+        break;
+      case "Евро":
+        result[0][4] = "€";
+        break;
+      case "Доллары":
+        result[0][4] = "$";
+        break;
+      case "Рубли":
+        result[0][4] = "₽";
+        break;
+    }
+    switch(form[0][6]){
+      case "Да":
+        result[0][5] = form[0][7];
+        break;
+      case "Нет":
+        result[0][5] = form[0][8];
+        break;
+    }
+    if(form[0][9] == "Да"){
+      result[0][6] = "TRUE";
+    }else{
+      result[0][6] = "FALSE";
+    }    
+  }
+  
+  rows_result.setValues(result);  
+}
