@@ -1,0 +1,157 @@
+function Main() {
+  var spreadsheet = SpreadsheetApp.openById("1KNKpDkXy0Z1dhajtGTND3E9L0QwRcyIMZUJ0KixxbpA");
+  var sheet_form = spreadsheet.getSheetByName("Form");
+  var sheet_result = spreadsheet.getSheetByName("Current");
+  
+  DotToComma(sheet_form);
+  Full_transfer(sheet_form,sheet_result);
+}
+
+function DotToComma(sheet) {
+  var range = sheet.getRange("D2:D");
+  range.setValues(range.getValues().map(function(row) {
+    return [row[0].toString().replace(".", ",")];
+  }));
+}
+
+function Full_transfer(sheet_form,sheet_result){
+  var N_form = sheet_form.getLastRow();  
+  var row_form = sheet_form.getRange(2, 1, N_form-1, 12);
+  var form = row_form.getValues();
+  
+  var result = [[]];
+  var i = 0;
+  var def = 0;
+
+  for(i=0;i<N_form-1;i++){
+    if(i > 0){
+      result.push([]);
+    }
+    if(form[i][6] == "Обмен валют"){    
+      if(form[i][1] == ""){
+        result[i+def][0] = form[i][0];
+      }else{
+        result[i+def][0] = form[i][1];
+      }
+      result[i+def][1] = "FALSE";
+      result[i+def][2] = form[i][2];
+      result[i+def][3] = form[i][3];
+      switch(form[i][4]){
+        case "Кроны":
+          result[i+def][4] = "Kč";
+          break;
+        case "Евро":
+          result[i+def][4] = "€";
+          break;
+        case "Доллары":
+          result[i+def][4] = "$";
+          break;
+        case "Рубли":
+          result[i+def][4] = "₽";
+          break;
+      }
+      result[i+def][5] = form[i][6];
+      result[i+def][6] = "FALSE";
+      
+      result.push([]);
+      if(form[i][1] == ""){
+        result[i+def+1][0] = form[i][0];
+      }else{
+        result[i+def+1][0] = form[i][1];
+      }
+      result[i+def+1][1] = "TRUE";
+      result[i+def+1][2] = form[i][2];
+      result[i+def+1][3] = form[i][10];
+      switch(form[i][11]){
+        case "Кроны":
+          result[i+def+1][4] = "Kč";
+          break;
+        case "Евро":
+          result[i+def+1][4] = "€";
+          break;
+        case "Доллары":
+          result[i+def+1][4] = "$";
+          break;
+        case "Рубли":
+          result[i+def+1][4] = "₽";
+          break;
+      }
+      result[i+def+1][5] = form[i][6];
+      result[i+def+1][6] = "FALSE";
+      
+      def++;
+    }else if(form[i][6] == "Пополнение кредитки"){    
+      if(form[i][1] == ""){
+        result[i+def][0] = form[i][0];
+      }else{
+        result[i+def][0] = form[i][1];
+      }
+      result[i+def][1] = "FALSE";
+      result[i+def][2] = form[i][2];
+      result[i+def][3] = form[i][3];
+      switch(form[i][4]){
+        case "Кроны":
+          result[i+def][4] = "Kč";
+          break;
+        case "Евро":
+          result[i+def][4] = "€";
+          break;
+        case "Доллары":
+          result[i+def][4] = "$";
+          break;
+        case "Рубли":
+          result[i+def][4] = "₽";
+          break;
+      }
+      result[i+def][5] = form[i][6];
+      result[i+def][6] = "TRUE";    
+    }else{    
+      if(form[i][1] == ""){
+        result[i+def][0] = form[i][0];
+      }else{
+        result[i+def][0] = form[i][1];
+      }
+      switch(form[i][6]){
+        case "Да":
+          result[i+def][1] = "TRUE";
+          break;
+        case "Нет":
+          result[i+def][1] = "FALSE";
+          break;}
+      result[i+def][2] = form[i][2];
+      result[i+def][3] = form[i][3];
+      switch(form[i][4]){
+        case "Кроны":
+          result[i+def][4] = "Kč";
+          break;
+        case "Евро":
+          result[i+def][4] = "€";
+          break;
+        case "Доллары":
+          result[i+def][4] = "$";
+          break;
+        case "Рубли":
+          result[i+def][4] = "₽";
+          break;
+      }
+      switch(form[i][6]){
+        case "Да":
+          result[i+def][5] = form[i][7];
+          break;
+        case "Нет":
+          result[i+def][5] = form[i][8];
+          break;
+      }
+      if(form[i][9] == "Да"){
+        result[i+def][6] = "TRUE";
+      }else{
+        result[i+def][6] = "FALSE";
+      }    
+    }
+  }
+  
+  var rows_result = sheet_result.getRange(2,1,N_form-1+def,7);
+  var col = rows_result.getNumColumns();
+  rows_result.setValues(result);
+  rows_result.sort(1);
+}
